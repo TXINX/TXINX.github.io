@@ -9,7 +9,7 @@ name: TX
 description: 游戏性中探寻规律性
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
-avatar: {{ site.baseurl }}/images/head.jpg
+avatar: https://txinx.github.io/images/head.jpg
 
 #
 # Flags below are optional

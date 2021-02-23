@@ -4,12 +4,12 @@ title: About
 permalink: /about/
 ---
 
-Some information about you!
+Game designer.
 
-### More Information
+### Just type something here to fill in the blank.
 
-A place to include any other types of information that you'd like to include about yourself.
+A series of interesting choices -- Sid Meier
 
 ### Contact me
 
-[email@domain.com](mailto:email@domain.com)
+[tangxinr at foxmail.com](mailto:tangxinr at foxmail.com)

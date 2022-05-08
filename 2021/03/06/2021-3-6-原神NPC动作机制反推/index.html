@@ -1,0 +1,187 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>原神NPC动作机制反推 | 踢叉叉的寻微之旅</title><meta name="keywords" content="Game Design,Game AI"><meta name="author" content="踢叉叉"><meta name="copyright" content="踢叉叉"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="前言 主角与NPC之间的交互，是虚拟世界中为NPC赋予灵性的重要环节。在传统RPG游戏中，往往通过对话、剧情演出等方式塑造NPC的人物形象，而在动作游戏中，NPC的动作表现受环境的反馈而对应变化也是其真实性的表现。 本文的主要内容是根据《原神》游戏内的实机表现，来反推其NPC动作系统中人物碰撞动作、人物受惊动作的实现机制。 从人物碰撞动作说起： 碰撞检测 首先，根据我对角色技能动作&#x2F;表现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="原神NPC动作机制反推">
+<meta property="og:url" content="https://txinx.github.io/2021/03/06/2021-3-6-%E5%8E%9F%E7%A5%9ENPC%E5%8A%A8%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%8F%8D%E6%8E%A8/index.html">
+<meta property="og:site_name" content="踢叉叉的寻微之旅">
+<meta property="og:description" content="前言 主角与NPC之间的交互，是虚拟世界中为NPC赋予灵性的重要环节。在传统RPG游戏中，往往通过对话、剧情演出等方式塑造NPC的人物形象，而在动作游戏中，NPC的动作表现受环境的反馈而对应变化也是其真实性的表现。 本文的主要内容是根据《原神》游戏内的实机表现，来反推其NPC动作系统中人物碰撞动作、人物受惊动作的实现机制。 从人物碰撞动作说起： 碰撞检测 首先，根据我对角色技能动作&#x2F;表现">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic1.zhimg.com%2Fv2-49216a6a123256cd87d3ae3638158bde_r.jpg%3Fsource%3D1940ef5c&refer=http%3A%2F%2Fpic1.zhimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654624995&t=2d110b326178b1a5fd91509becea1186">
+<meta property="article:published_time" content="2021-03-06T07:47:46.000Z">
+<meta property="article:modified_time" content="2022-05-08T18:09:56.478Z">
+<meta property="article:author" content="踢叉叉">
+<meta property="article:tag" content="Game Design">
+<meta property="article:tag" content="Game AI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic1.zhimg.com%2Fv2-49216a6a123256cd87d3ae3638158bde_r.jpg%3Fsource%3D1940ef5c&refer=http%3A%2F%2Fpic1.zhimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654624995&t=2d110b326178b1a5fd91509becea1186"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://txinx.github.io/2021/03/06/2021-3-6-%E5%8E%9F%E7%A5%9ENPC%E5%8A%A8%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%8F%8D%E6%8E%A8/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '原神NPC动作机制反推',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-05-09 02:09:56'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.1.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/base/favicon.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic1.zhimg.com%2Fv2-49216a6a123256cd87d3ae3638158bde_r.jpg%3Fsource%3D1940ef5c&amp;refer=http%3A%2F%2Fpic1.zhimg.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1654624995&amp;t=2d110b326178b1a5fd91509becea1186')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">踢叉叉的寻微之旅</a></span><div id="menus"><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">原神NPC动作机制反推</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-03-06T07:47:46.000Z" title="发表于 2021-03-06 15:47:46">2021-03-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-05-08T18:09:56.478Z" title="更新于 2022-05-09 02:09:56">2022-05-09</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="原神NPC动作机制反推"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="前言">前言</h2>
+<p>主角与NPC之间的交互，是虚拟世界中为NPC赋予灵性的重要环节。在传统RPG游戏中，往往通过对话、剧情演出等方式塑造NPC的人物形象，而在动作游戏中，NPC的动作表现受环境的反馈而对应变化也是其真实性的表现。</p>
+<p>本文的主要内容是根据《原神》游戏内的实机表现，来反推其NPC动作系统中人物碰撞动作、人物受惊动作的实现机制。</p>
+<p>从人物碰撞动作说起：</p>
+<h2 id="碰撞检测">碰撞检测</h2>
+<p>首先，根据我对角色技能动作/表现动作的观察，原神的动作实现机制应该是网游中比较常见的Code
+Driven Locomotion，只是IK做的比较好，另外估计还自研了Root Motion
+Extractor将动画数据提取并应用到角色身上。这一方案下，对于角色位置信息的维护应该都是基于模型中心点来判断，那么关于角色碰撞大概率就是直接以空间距离来进行判定。</p>
+<p>经测试，</p>
+<p>案例1：从墙上往NPC头上跳/飞行时，如果按住方向轮盘触发输入则会触发碰撞动画，否则不会触发碰撞动画</p>
+<p>案例2：当NPC主动朝你的方向走来并进入碰撞距离时，不会触发碰撞动画</p>
+<p>案例3：当角色处于碰撞范围内时，朝任意方向发起跑步指令不会触发碰撞动画</p>
+<p>案例4：以行走状态进行位移任何情况下不会触发碰撞动画</p>
+<p>案例5:
+处于特殊动作状态的NPC不受碰撞行为影响（如剧情任务中，蒙德城中受惊的NPC)</p>
+<p>结合上面的测试案例，我们可以大胆推断如下几点: -
+以一个巡逻士兵为例，Idle状态下无交互一定时间后进入Patrolling（巡逻）状态，这两个状态下如果受到碰撞进入RunInto（被碰撞）状态，如果被惊吓进入Threatened（被惊吓）状态，RunInto与Threatened状态下无交互一段时间后返回Idle状态或Patrolling状态。</p>
+<p>写个伪代码的行为树实现： <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">enum STATUS = &#123;</span><br><span class="line">    Idle,</span><br><span class="line">    Patrolling,</span><br><span class="line">    RunInto,</span><br><span class="line">    Threatened</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">status = STATUS.Idle</span><br><span class="line">Loop:</span><br><span class="line">    //RunInto和Threatened两种状态下不可交互</span><br><span class="line">    If status == STATUS.Idle <span class="keyword">or</span> STATUS.Patrolling:</span><br><span class="line">        If RunInto():</span><br><span class="line">            status = STATUS.RunInto</span><br><span class="line">            PlayAnim(Anim.RunInto, playerPosition)</span><br><span class="line">            WaitForSeconds(<span class="number">3</span>)</span><br><span class="line">            status = STATUS.Idle</span><br><span class="line">        Elif Threatened():</span><br><span class="line">            PlayAnim(Anim.Threatened, playerPosition)</span><br><span class="line">            status = STATUS.Threatened</span><br><span class="line">            WaitForSeconds(<span class="number">3</span>)</span><br><span class="line">            status = STATUS.Idle</span><br><span class="line"></span><br><span class="line">        If status == STATUS.Idle:</span><br><span class="line">            If AsyncWaitForSeconds(someTime):</span><br><span class="line">                status = STATUS.Patrolling</span><br><span class="line">                Patrol()</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>当角色首次进入碰撞的范围时，若满足条件（角色处于奔跑状态），根据对方的位置改变自己的朝向并播放对应的动画（原神中有前向被撞和后向被撞两种动画）。伪代码：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">// 表示玩家是否首次进入碰撞区域</span><br><span class="line">self.isPlayerNearBy = false</span><br><span class="line"><span class="built_in">bool</span> RunInto():</span><br><span class="line">    If Distance(self, player) &lt; self.model.radius+<span class="number">0.1</span>:</span><br><span class="line">        <span class="keyword">if</span> self.isPlayerNearBy == false:</span><br><span class="line">            self.isPlayerNearBy == true</span><br><span class="line">            //当前左轮盘Input输入量大于某个阈值时才会触发碰撞动画</span><br><span class="line">            <span class="keyword">if</span> player.STATUS = Running:</span><br><span class="line">                <span class="keyword">return</span> true</span><br><span class="line">    Elif self.isPlayerNearBy == true:</span><br><span class="line">        self.isPlayerNearBy = false</span><br><span class="line">    <span class="keyword">return</span> false</span><br><span class="line"></span><br><span class="line">Funtion PlayAnim(Anim.RunInto, playerPosition):</span><br><span class="line">    //如果碰撞点在NPC的面前<span class="number">180</span>度范围内（position是Vector2类型，dot是向量內积）</span><br><span class="line">    <span class="keyword">if</span> dot((playerPosition - self.position), self.forwardDirection) &gt; <span class="number">0</span>:</span><br><span class="line">        //面向主角</span><br><span class="line">        self.FaceTo(playerPosition)</span><br><span class="line">        AnimationClip(<span class="string">&quot;RunIntoFace&quot;</span>).Play()</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        //背向主角</span><br><span class="line">        self.FaceTo(<span class="number">2</span>*self.position-playerPosition)</span><br><span class="line">        AnimationClip(<span class="string">&quot;RunIntoBack&quot;</span>).Play()</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>受惊吓的逻辑和被碰撞有些类似，条件是：</p>
+<ol type="1">
+<li>主角距NPC距离在X米内（目测3米）</li>
+<li>主角面朝NPC（主角的前向180度角内）</li>
+<li>主角进行攻击</li>
+</ol></li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">踢叉叉</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://txinx.github.io/2021/03/06/2021-3-6-%E5%8E%9F%E7%A5%9ENPC%E5%8A%A8%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%8F%8D%E6%8E%A8/">https://txinx.github.io/2021/03/06/2021-3-6-%E5%8E%9F%E7%A5%9ENPC%E5%8A%A8%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%8F%8D%E6%8E%A8/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://TXINX.github.io" target="_blank">踢叉叉的寻微之旅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Game-Design/">Game Design</a><a class="post-meta__tags" href="/tags/Game-AI/">Game AI</a></div><div class="post_share"><div class="social-share" data-image="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic1.zhimg.com%2Fv2-49216a6a123256cd87d3ae3638158bde_r.jpg%3Fsource%3D1940ef5c&amp;refer=http%3A%2F%2Fpic1.zhimg.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1654624995&amp;t=2d110b326178b1a5fd91509becea1186" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/03/19/2021-3-19-%E7%BA%BF%E6%80%A7%E8%A7%84%E5%88%92%E5%9C%A8%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F%E5%9F%BA%E5%BB%BA%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/"><img class="prev-cover" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.nga.178.com%2Fattachments%2Fmon_201905%2F24%2F-7Q5-854qXdZ3lT3cS1z4-140.jpg&amp;refer=http%3A%2F%2Fimg.nga.178.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1654625496&amp;t=e582ab053c5ad5a9a0cd09dbe1ca27e2" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">线性规划在明日方舟基建系统中的应用</div></div></a></div><div class="next-post pull-right"><a href="/2021/02/16/2021-2-16-%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F%E6%AF%8F%E6%97%A5%E4%BB%BB%E5%8A%A1%E7%B3%BB%E7%BB%9F%E5%8F%8D%E6%8E%A8/"><img class="next-cover" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farticle%2Fc2b29fd8ca5f5f5e1868847ace34b1dd7245dd77.png&amp;refer=http%3A%2F%2Fi0.hdslb.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1654624533&amp;t=1cc5d3a0e22a3a411ca294349ad51521" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">明日方舟每日任务系统反推</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/04/05/2021-4-5-%E5%A6%82%E4%BD%95%E4%B8%BA%E5%86%B3%E6%96%97%E9%93%BE%E6%8E%A5%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA%E6%9B%B4%E6%99%BA%E6%85%A7%E7%9A%84AI/" title="如何为决斗链接设计一个更智慧的AI"><img class="cover" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fb17cc9fac11751e7f98e16ef37039719244afbbe.jpg&refer=http%3A%2F%2Fi0.hdslb.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654625796&t=889ad9cdfcbb69a33c2b155c390108e6" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-04-05</div><div class="title">如何为决斗链接设计一个更智慧的AI</div></div></a></div><div><a href="/2021/05/20/2021-5-20-%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E7%A7%AF%E5%88%86%E7%B3%BB%E7%BB%9F%E8%A7%A3%E8%AF%BB/" title="酒馆战棋积分系统解读"><img class="cover" src="https://img2.baidu.com/it/u=3367475766,2718671385&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-20</div><div class="title">酒馆战棋积分系统解读</div></div></a></div><div><a href="/2021/07/05/2021-7-5-%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E6%AE%B5%E4%BD%8D%E7%AE%97%E6%B3%95%E9%87%8D%E5%BB%BA%E4%B8%8E%E7%B3%BB%E6%95%B0%E6%8E%A8%E5%AF%BC/" title="酒馆战棋段位算法重建与系数推导"><img class="cover" src="https://img0.baidu.com/it/u=492854779,2716447158&fm=253&fmt=auto&app=138&f=JPEG?w=1072&h=500" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-07-05</div><div class="title">酒馆战棋段位算法重建与系数推导</div></div></a></div><div><a href="/2022/01/04/Componential%20Tree,%E4%B8%80%E7%A7%8D%E8%A1%8C%E4%B8%BA%E6%A0%91%E6%A8%A1%E5%9D%97%E5%8C%96%E7%9A%84%E7%BB%84%E7%BB%87%E6%A1%86%E6%9E%B6/" title="Componential Tree, 一种行为树模块化的组织框架"><img class="cover" src="/images/BehaviourTree/Sample.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-04</div><div class="title">Componential Tree, 一种行为树模块化的组织框架</div></div></a></div><div><a href="/2021/11/27/%E7%A0%B4%E6%99%93%E4%BC%A0%E8%AF%B4%E6%B8%B8%E7%8E%A9%E7%AC%94%E8%AE%B0/" title="破晓传说游玩笔记"><img class="cover" src="https://img2.baidu.com/it/u=458559976,3305785865&fm=253&fmt=auto?w=1524&h=800" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-11-27</div><div class="title">破晓传说游玩笔记</div></div></a></div><div><a href="/2021/02/16/2021-2-16-%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F%E6%AF%8F%E6%97%A5%E4%BB%BB%E5%8A%A1%E7%B3%BB%E7%BB%9F%E5%8F%8D%E6%8E%A8/" title="明日方舟每日任务系统反推"><img class="cover" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farticle%2Fc2b29fd8ca5f5f5e1868847ace34b1dd7245dd77.png&refer=http%3A%2F%2Fi0.hdslb.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654624533&t=1cc5d3a0e22a3a411ca294349ad51521" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-02-16</div><div class="title">明日方舟每日任务系统反推</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/base/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">踢叉叉</div><div class="author-info__description">Game Designer</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A2%B0%E6%92%9E%E6%A3%80%E6%B5%8B"><span class="toc-number">2.</span> <span class="toc-text">碰撞检测</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/01/04/Componential%20Tree,%E4%B8%80%E7%A7%8D%E8%A1%8C%E4%B8%BA%E6%A0%91%E6%A8%A1%E5%9D%97%E5%8C%96%E7%9A%84%E7%BB%84%E7%BB%87%E6%A1%86%E6%9E%B6/" title="Componential Tree, 一种行为树模块化的组织框架"><img src="/images/BehaviourTree/Sample.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Componential Tree, 一种行为树模块化的组织框架"/></a><div class="content"><a class="title" href="/2022/01/04/Componential%20Tree,%E4%B8%80%E7%A7%8D%E8%A1%8C%E4%B8%BA%E6%A0%91%E6%A8%A1%E5%9D%97%E5%8C%96%E7%9A%84%E7%BB%84%E7%BB%87%E6%A1%86%E6%9E%B6/" title="Componential Tree, 一种行为树模块化的组织框架">Componential Tree, 一种行为树模块化的组织框架</a><time datetime="2022-01-04T07:47:46.000Z" title="发表于 2022-01-04 15:47:46">2022-01-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/11/27/%E7%A0%B4%E6%99%93%E4%BC%A0%E8%AF%B4%E6%B8%B8%E7%8E%A9%E7%AC%94%E8%AE%B0/" title="破晓传说游玩笔记"><img src="https://img2.baidu.com/it/u=458559976,3305785865&amp;fm=253&amp;fmt=auto?w=1524&amp;h=800" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="破晓传说游玩笔记"/></a><div class="content"><a class="title" href="/2021/11/27/%E7%A0%B4%E6%99%93%E4%BC%A0%E8%AF%B4%E6%B8%B8%E7%8E%A9%E7%AC%94%E8%AE%B0/" title="破晓传说游玩笔记">破晓传说游玩笔记</a><time datetime="2021-11-27T07:47:46.000Z" title="发表于 2021-11-27 15:47:46">2021-11-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/07/05/2021-7-5-%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E6%AE%B5%E4%BD%8D%E7%AE%97%E6%B3%95%E9%87%8D%E5%BB%BA%E4%B8%8E%E7%B3%BB%E6%95%B0%E6%8E%A8%E5%AF%BC/" title="酒馆战棋段位算法重建与系数推导"><img src="https://img0.baidu.com/it/u=492854779,2716447158&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=1072&amp;h=500" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="酒馆战棋段位算法重建与系数推导"/></a><div class="content"><a class="title" href="/2021/07/05/2021-7-5-%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E6%AE%B5%E4%BD%8D%E7%AE%97%E6%B3%95%E9%87%8D%E5%BB%BA%E4%B8%8E%E7%B3%BB%E6%95%B0%E6%8E%A8%E5%AF%BC/" title="酒馆战棋段位算法重建与系数推导">酒馆战棋段位算法重建与系数推导</a><time datetime="2021-07-05T07:47:46.000Z" title="发表于 2021-07-05 15:47:46">2021-07-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/20/2021-5-20-%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E7%A7%AF%E5%88%86%E7%B3%BB%E7%BB%9F%E8%A7%A3%E8%AF%BB/" title="酒馆战棋积分系统解读"><img src="https://img2.baidu.com/it/u=3367475766,2718671385&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=800&amp;h=500" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="酒馆战棋积分系统解读"/></a><div class="content"><a class="title" href="/2021/05/20/2021-5-20-%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E7%A7%AF%E5%88%86%E7%B3%BB%E7%BB%9F%E8%A7%A3%E8%AF%BB/" title="酒馆战棋积分系统解读">酒馆战棋积分系统解读</a><time datetime="2021-05-20T07:47:46.000Z" title="发表于 2021-05-20 15:47:46">2021-05-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/05/2021-4-5-%E5%A6%82%E4%BD%95%E4%B8%BA%E5%86%B3%E6%96%97%E9%93%BE%E6%8E%A5%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA%E6%9B%B4%E6%99%BA%E6%85%A7%E7%9A%84AI/" title="如何为决斗链接设计一个更智慧的AI"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fb17cc9fac11751e7f98e16ef37039719244afbbe.jpg&amp;refer=http%3A%2F%2Fi0.hdslb.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1654625796&amp;t=889ad9cdfcbb69a33c2b155c390108e6" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="如何为决斗链接设计一个更智慧的AI"/></a><div class="content"><a class="title" href="/2021/04/05/2021-4-5-%E5%A6%82%E4%BD%95%E4%B8%BA%E5%86%B3%E6%96%97%E9%93%BE%E6%8E%A5%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA%E6%9B%B4%E6%99%BA%E6%85%A7%E7%9A%84AI/" title="如何为决斗链接设计一个更智慧的AI">如何为决斗链接设计一个更智慧的AI</a><time datetime="2021-04-05T07:47:46.000Z" title="发表于 2021-04-05 15:47:46">2021-04-05</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic1.zhimg.com%2Fv2-49216a6a123256cd87d3ae3638158bde_r.jpg%3Fsource%3D1940ef5c&amp;refer=http%3A%2F%2Fpic1.zhimg.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1654624995&amp;t=2d110b326178b1a5fd91509becea1186')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By 踢叉叉</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

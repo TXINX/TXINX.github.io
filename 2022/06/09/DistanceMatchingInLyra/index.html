@@ -1,0 +1,207 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Lyra中的Distance Matching | 踢叉叉的寻微之旅</title><meta name="keywords" content="Unreal Engine,Animation"><meta name="author" content="踢叉叉"><meta name="copyright" content="踢叉叉"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="一、前言 关于游戏的角色位移与角色动画中一直有一个值得争议的问题，那就是应该让代码&#x2F;运动学驱动位移还是动画数据驱动位移。 代码&#x2F;运动学驱动就是我们常见到的通过赋予一个角色速度、加速度、冲量，来增量地作用于角色的transform。  而动画数据驱动则是通过读取动画片段中存储的根骨骼偏移量，随着时间而对应地赋予角色transform以增量。 单独使用它们都会有各自的问题，代码&#x2F;运动学驱动会">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lyra中的Distance Matching">
+<meta property="og:url" content="https://txinx.github.io/2022/06/09/DistanceMatchingInLyra/index.html">
+<meta property="og:site_name" content="踢叉叉的寻微之旅">
+<meta property="og:description" content="一、前言 关于游戏的角色位移与角色动画中一直有一个值得争议的问题，那就是应该让代码&#x2F;运动学驱动位移还是动画数据驱动位移。 代码&#x2F;运动学驱动就是我们常见到的通过赋予一个角色速度、加速度、冲量，来增量地作用于角色的transform。  而动画数据驱动则是通过读取动画片段中存储的根骨骼偏移量，随着时间而对应地赋予角色transform以增量。 单独使用它们都会有各自的问题，代码&#x2F;运动学驱动会">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://docs.unrealengine.com/5.0/Images/animating-characters-and-objects/SkeletalMeshAnimation/AssetsFeatures/Locomotion/distance-matching/BannerImage.png">
+<meta property="article:published_time" content="2022-06-08T18:01:11.000Z">
+<meta property="article:modified_time" content="2022-06-08T18:05:47.308Z">
+<meta property="article:author" content="踢叉叉">
+<meta property="article:tag" content="Unreal Engine">
+<meta property="article:tag" content="Animation">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://docs.unrealengine.com/5.0/Images/animating-characters-and-objects/SkeletalMeshAnimation/AssetsFeatures/Locomotion/distance-matching/BannerImage.png"><link rel="shortcut icon" href="/images/base/t.jpeg"><link rel="canonical" href="https://txinx.github.io/2022/06/09/DistanceMatchingInLyra/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Lyra中的Distance Matching',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-06-09 02:05:47'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.1.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/base/favicon.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://docs.unrealengine.com/5.0/Images/animating-characters-and-objects/SkeletalMeshAnimation/AssetsFeatures/Locomotion/distance-matching/BannerImage.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">踢叉叉的寻微之旅</a></span><div id="menus"><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Lyra中的Distance Matching</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-06-08T18:01:11.000Z" title="发表于 2022-06-09 02:01:11">2022-06-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-06-08T18:05:47.308Z" title="更新于 2022-06-09 02:05:47">2022-06-09</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Lyra中的Distance Matching"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="一前言">一、前言</h2>
+<p>关于游戏的角色位移与角色动画中一直有一个值得争议的问题，那就是应该让代码/运动学驱动位移还是动画数据驱动位移。</p>
+<p>代码/运动学驱动就是我们常见到的通过赋予一个角色速度、加速度、冲量，来增量地作用于角色的transform。
+<img src="./01.png" alt="Snapshot" /></p>
+<p>而动画数据驱动则是通过读取动画片段中存储的根骨骼偏移量，随着时间而对应地赋予角色transform以增量。</p>
+<p>单独使用它们都会有各自的问题，代码/运动学驱动会使移动更有规律更符合玩家预期，但是往往代码驱动的位移与动画中表现的位移量会有偏差，导致滑步等现象。而动画数据驱动的位移质量取决于动画的数量，如果动画数量过少会导致在过渡区由于没有合适的动画，无法产生符合玩家直觉的位移量，从而导致玩家感觉角色“笨拙”、“不好操作”。</p>
+<h2 id="二motion-matching">二、Motion Matching</h2>
+<p>目前动画数据驱动这个方向的极致方案是Motion
+Matching(Code-Driven同样可以使用！），通过对一个庞大的姿势库进行采样和特征提取，在运行时匹配特征最相近的姿势进行播放。
+尽管在很多3A级端游中，Motion
+Matching已经斩获了亮眼的表现。但是对于手机游戏而言，想要将一个庞大的姿势库加载在内存中将是一个巨大的挑战，同时姿势匹配的运算量恐怕对于手机来说也是一个难题，目前还没有已上线的手机游戏采用了这项技术。</p>
+<p>Motion Matching的一些细节可以参考下文。</p>
+<p><a
+target="_blank" rel="noopener" href="https://theorangeduck.com/page/code-vs-data-driven-displacement">来自育碧研究员的博文</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/432663486">对应的中文翻译</a></p>
+<h2 id="三distance-matching">三、Distance Matching</h2>
+<p>不过今天要讲的不是Motion Matching，而是与之有些相似的Distance
+Matching技术。</p>
+<p>我们以数据的眼光来审视一个动画资源文件，一个动画是由数个帧组成的，而每个帧对应地存储了所有骨骼点相对于根节点的相对坐标，那么给定一个方向，我们可以得出每一帧在这个方向上的偏移量，累加后即为从开始时刻到当前时刻的总位移量。</p>
+<h3 id="坠落动画">坠落动画</h3>
+<p><img
+src="https://docs.unrealengine.com/5.0/Images/animating-characters-and-objects/SkeletalMeshAnimation/AssetsFeatures/Locomotion/distance-matching/LyraDistanceMatchingDemo.gif" /></p>
+<p>在Unreal的<a
+target="_blank" rel="noopener" href="https://docs.unrealengine.com/5.0/zh-CN/distance-matching-in-unreal-engine/">官方文档</a>中，给出了一个落地动画播放的示例。
+Distance Matching流程：</p>
+<ul>
+<li>离线：首先对动画资源进行采样，将累计根位移量保存至曲线上。(采样的详细流程见官方文档)</li>
+<li>获取当前距地面距离，在曲线上查找对应姿势</li>
+<li>直接输出对应姿势，而不是随着时间逐帧过渡姿势</li>
+</ul>
+<p>这样做有什么好处？</p>
+<ul>
+<li>只需要一个动画文件即可完成以往需要通过两个动画状态Falling
+Loop、Falling Landing才能完成的过渡。</li>
+<li>动画可以更好地匹配非匀速的坠落速度而不需要让动画师来花费更多工作来调整</li>
+</ul>
+<h3 id="停步动画">停步动画</h3>
+<p>除了官方的例子之外，我再额外选取Lyra项目中的停步动画来展示其应用。
+正如我们在前面说到的，Distance
+Matching通过用一个距离变量来查找动画资源上对应的姿势，在停步动画这个应用中，我们所使用的这个“距离”就是“角色距离完全停止位置的距离”，在Lyra项目中，是通过与角色运动组件相关的库函数UAnimCharacterMovementLibrary::PredictGroundMovementStopLocation来根据当前的各项变量（速度、加速度、摩擦力等）来预测距离完全停止的距离。
+<img src="./02.png" alt="Predict Stop Distance" /></p>
+<p>而对应地，动画资源中也采样出每个采样帧距离完全停止姿态帧的距离并保存为曲线。
+<img src="./03.png" alt="Predict Stop Distance" /></p>
+<p>而在动画蓝图中，一旦进入停步状态后，就会持续更新这个预测距离，并选取曲线值对应的停步姿势，来达到动画位置与运动学位置完全匹配的效果。</p>
+<p>从另一个角度来看，这是对Motion
+Matching的一种彻底Code-Driven的简化实现，只考虑了Distance这一个特征。</p>
+<p><img src="./05.gif" alt="Predict Stop Distance" />
+这样粗暴的姿势选取会存在一个问题，那就是如果预测距离变化较为频繁时(例如玩家短促地连敲输入键，可能会对角色的加速度造成较大影响），会出现姿势瞬时变化过大的情况，也就是我们常说的“人物抽搐”。一个比较好的解决方案就是对预测结果和上一帧的预测结果做缓冲或者插值。此外Unreal官方还提供了一些通过有限调整播放速度来“趋向”匹配姿势的功能节点，避免直接选择姿势的生硬切换。
+<!-- ![Predict Stop Distance](./04.png) --></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">踢叉叉</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://txinx.github.io/2022/06/09/DistanceMatchingInLyra/">https://txinx.github.io/2022/06/09/DistanceMatchingInLyra/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://TXINX.github.io" target="_blank">踢叉叉的寻微之旅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Unreal-Engine/">Unreal Engine</a><a class="post-meta__tags" href="/tags/Animation/">Animation</a></div><div class="post_share"><div class="social-share" data-image="https://docs.unrealengine.com/5.0/Images/animating-characters-and-objects/SkeletalMeshAnimation/AssetsFeatures/Locomotion/distance-matching/BannerImage.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/01/04/ComponentialTree,%20%E4%B8%80%E7%A7%8D%E8%A1%8C%E4%B8%BA%E6%A0%91%E6%A8%A1%E5%9D%97%E5%8C%96%E7%9A%84%E7%BB%84%E7%BB%87%E6%A1%86%E6%9E%B6/"><img class="next-cover" src="/images/BehaviourTree/Sample.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Componential Tree, 一种行为树模块化的组织框架</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/base/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">踢叉叉</div><div class="author-info__description">Game Designer</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/TXINX"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Have fun in gaming and making games!</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">一、前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8Cmotion-matching"><span class="toc-number">2.</span> <span class="toc-text">二、Motion Matching</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89distance-matching"><span class="toc-number">3.</span> <span class="toc-text">三、Distance Matching</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%A0%E8%90%BD%E5%8A%A8%E7%94%BB"><span class="toc-number">3.1.</span> <span class="toc-text">坠落动画</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%81%9C%E6%AD%A5%E5%8A%A8%E7%94%BB"><span class="toc-number">3.2.</span> <span class="toc-text">停步动画</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/06/09/DistanceMatchingInLyra/" title="Lyra中的Distance Matching"><img src="https://docs.unrealengine.com/5.0/Images/animating-characters-and-objects/SkeletalMeshAnimation/AssetsFeatures/Locomotion/distance-matching/BannerImage.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Lyra中的Distance Matching"/></a><div class="content"><a class="title" href="/2022/06/09/DistanceMatchingInLyra/" title="Lyra中的Distance Matching">Lyra中的Distance Matching</a><time datetime="2022-06-08T18:01:11.000Z" title="发表于 2022-06-09 02:01:11">2022-06-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/01/04/ComponentialTree,%20%E4%B8%80%E7%A7%8D%E8%A1%8C%E4%B8%BA%E6%A0%91%E6%A8%A1%E5%9D%97%E5%8C%96%E7%9A%84%E7%BB%84%E7%BB%87%E6%A1%86%E6%9E%B6/" title="Componential Tree, 一种行为树模块化的组织框架"><img src="/images/BehaviourTree/Sample.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Componential Tree, 一种行为树模块化的组织框架"/></a><div class="content"><a class="title" href="/2022/01/04/ComponentialTree,%20%E4%B8%80%E7%A7%8D%E8%A1%8C%E4%B8%BA%E6%A0%91%E6%A8%A1%E5%9D%97%E5%8C%96%E7%9A%84%E7%BB%84%E7%BB%87%E6%A1%86%E6%9E%B6/" title="Componential Tree, 一种行为树模块化的组织框架">Componential Tree, 一种行为树模块化的组织框架</a><time datetime="2022-01-04T07:47:46.000Z" title="发表于 2022-01-04 15:47:46">2022-01-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/11/27/%E7%A0%B4%E6%99%93%E4%BC%A0%E8%AF%B4%E6%B8%B8%E7%8E%A9%E7%AC%94%E8%AE%B0/" title="破晓传说游玩笔记"><img src="https://img2.baidu.com/it/u=458559976,3305785865&amp;fm=253&amp;fmt=auto?w=1524&amp;h=800" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="破晓传说游玩笔记"/></a><div class="content"><a class="title" href="/2021/11/27/%E7%A0%B4%E6%99%93%E4%BC%A0%E8%AF%B4%E6%B8%B8%E7%8E%A9%E7%AC%94%E8%AE%B0/" title="破晓传说游玩笔记">破晓传说游玩笔记</a><time datetime="2021-11-27T07:47:46.000Z" title="发表于 2021-11-27 15:47:46">2021-11-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/07/05/%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E6%AE%B5%E4%BD%8D%E7%AE%97%E6%B3%95%E9%87%8D%E5%BB%BA%E4%B8%8E%E7%B3%BB%E6%95%B0%E6%8E%A8%E5%AF%BC/" title="酒馆战棋段位算法重建与系数推导"><img src="https://img0.baidu.com/it/u=492854779,2716447158&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=1072&amp;h=500" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="酒馆战棋段位算法重建与系数推导"/></a><div class="content"><a class="title" href="/2021/07/05/%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E6%AE%B5%E4%BD%8D%E7%AE%97%E6%B3%95%E9%87%8D%E5%BB%BA%E4%B8%8E%E7%B3%BB%E6%95%B0%E6%8E%A8%E5%AF%BC/" title="酒馆战棋段位算法重建与系数推导">酒馆战棋段位算法重建与系数推导</a><time datetime="2021-07-05T07:47:46.000Z" title="发表于 2021-07-05 15:47:46">2021-07-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/20/%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E7%A7%AF%E5%88%86%E7%B3%BB%E7%BB%9F%E8%A7%A3%E8%AF%BB/" title="酒馆战棋积分系统解读"><img src="https://img2.baidu.com/it/u=3367475766,2718671385&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=800&amp;h=500" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="酒馆战棋积分系统解读"/></a><div class="content"><a class="title" href="/2021/05/20/%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E7%A7%AF%E5%88%86%E7%B3%BB%E7%BB%9F%E8%A7%A3%E8%AF%BB/" title="酒馆战棋积分系统解读">酒馆战棋积分系统解读</a><time datetime="2021-05-20T07:47:46.000Z" title="发表于 2021-05-20 15:47:46">2021-05-20</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://docs.unrealengine.com/5.0/Images/animating-characters-and-objects/SkeletalMeshAnimation/AssetsFeatures/Locomotion/distance-matching/BannerImage.png')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By 踢叉叉</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

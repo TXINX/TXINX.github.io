@@ -1,0 +1,219 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>如何为决斗链接设计一个更智慧的AI | 踢叉叉的寻微之旅</title><meta name="keywords" content="Game Design,Game AI"><meta name="author" content="踢叉叉"><meta name="copyright" content="踢叉叉"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="前言：本文的目标 游戏王：决斗链接是一款DBG手游，其核心策略体现在卡牌资源（手卡、场上卡）与环境资源（通招点、卡位、生命值）的管理与合理运用。 如果想要为决斗链接设计一个AI，这个AI需要有能力“理解”卡牌的两项内容：1.卡牌效果 2.连锁响应。1决定了AI如何定义卡牌的价值，最大化地利用自己的卡牌；2决定了AI如何安排卡牌的使用顺序以及对抗对手的卡牌效果。 由于当前版本的决斗链接的AI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何为决斗链接设计一个更智慧的AI">
+<meta property="og:url" content="https://txinx.github.io/2021/04/05/%E5%A6%82%E4%BD%95%E4%B8%BA%E5%86%B3%E6%96%97%E9%93%BE%E6%8E%A5%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA%E6%9B%B4%E6%99%BA%E6%85%A7%E7%9A%84AI/index.html">
+<meta property="og:site_name" content="踢叉叉的寻微之旅">
+<meta property="og:description" content="前言：本文的目标 游戏王：决斗链接是一款DBG手游，其核心策略体现在卡牌资源（手卡、场上卡）与环境资源（通招点、卡位、生命值）的管理与合理运用。 如果想要为决斗链接设计一个AI，这个AI需要有能力“理解”卡牌的两项内容：1.卡牌效果 2.连锁响应。1决定了AI如何定义卡牌的价值，最大化地利用自己的卡牌；2决定了AI如何安排卡牌的使用顺序以及对抗对手的卡牌效果。 由于当前版本的决斗链接的AI">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fb17cc9fac11751e7f98e16ef37039719244afbbe.jpg&refer=http%3A%2F%2Fi0.hdslb.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654625796&t=889ad9cdfcbb69a33c2b155c390108e6">
+<meta property="article:published_time" content="2021-04-05T07:47:46.000Z">
+<meta property="article:modified_time" content="2022-05-08T18:16:43.666Z">
+<meta property="article:author" content="踢叉叉">
+<meta property="article:tag" content="Game Design">
+<meta property="article:tag" content="Game AI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fb17cc9fac11751e7f98e16ef37039719244afbbe.jpg&refer=http%3A%2F%2Fi0.hdslb.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654625796&t=889ad9cdfcbb69a33c2b155c390108e6"><link rel="shortcut icon" href="/images/base/t.jpeg"><link rel="canonical" href="https://txinx.github.io/2021/04/05/%E5%A6%82%E4%BD%95%E4%B8%BA%E5%86%B3%E6%96%97%E9%93%BE%E6%8E%A5%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA%E6%9B%B4%E6%99%BA%E6%85%A7%E7%9A%84AI/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '如何为决斗链接设计一个更智慧的AI',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-05-09 02:16:43'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.1.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/base/favicon.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fb17cc9fac11751e7f98e16ef37039719244afbbe.jpg&amp;refer=http%3A%2F%2Fi0.hdslb.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1654625796&amp;t=889ad9cdfcbb69a33c2b155c390108e6')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">踢叉叉的寻微之旅</a></span><div id="menus"><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">如何为决斗链接设计一个更智慧的AI</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-04-05T07:47:46.000Z" title="发表于 2021-04-05 15:47:46">2021-04-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-05-08T18:16:43.666Z" title="更新于 2022-05-09 02:16:43">2022-05-09</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="如何为决斗链接设计一个更智慧的AI"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="前言本文的目标">前言：本文的目标</h2>
+<p>游戏王：决斗链接是一款DBG手游，其核心策略体现在卡牌资源（手卡、场上卡）与环境资源（通招点、卡位、生命值）的管理与合理运用。
+如果想要为决斗链接设计一个AI，这个AI需要有能力“理解”卡牌的两项内容：1.卡牌效果
+2.连锁响应。1决定了AI如何定义卡牌的价值，最大化地利用自己的卡牌；2决定了AI如何安排卡牌的使用顺序以及对抗对手的卡牌效果。
+由于当前版本的决斗链接的AI机制还相当原始，所以本文主要针对游戏王：决斗链接的AI机制进行一定的分析并提出一个更优地运用卡牌的AI方案。
+以下是两点前置说明： 1.
+游戏AI并不是越聪明越好，在对战中“适当地”输给玩家，也是一种游戏设计思路（AI卡牌强度高于玩家却由于运营失误告负，可以给玩家带来智力上的优越感。）
+2.
+本文中的AI指的是脚本、程序控制策略，如何用规则描述卡牌使用方法，而非基于机器学习的胜率最大化模型。</p>
+<h2
+id="炉石传说与决斗链接炉石传说ai策略设计">炉石传说与决斗链接：炉石传说AI策略设计</h2>
+<p>横向对比炉石传说与决斗链接的AI，由于炉石传说具有两个特点：1。基本没有回合外反制；2.大部分随从卡在放置后次回合才可以进行攻击。因此，在设计AI时，只需要考虑场上信息与手卡信息，当做完全信息博弈来最优化地使用卡牌，就可以得到一个看上去像是个莽夫的AI了。
+此外，炉石的卡牌是有标准模型的，什么身材的随从价值多少费，1/1/1吸血的鱼人和1/2/1白板的随从哪个应该优先消灭都能用一条公式来衡量。</p>
+<p>综上所述，对于炉石传说而言，一个简单好用的方案就是：将手牌中，所有卡牌的任意使用序列构造一个搜索树，搜索时根据费用限制做剪枝，这样每一条搜索路径都代表一个合法的卡牌使用序列。对于每一张牌，通过价值公式判断其使用目标，对于每一个序列，根据价值公式演算对应的卡牌依次用后，场面上达成的最终价值作为该分支的最终效用值。效用(Utility)最高的分支即作为AI本回合的执行策略。如果实际应用中AI计算速度偏慢的话，还可以做一些优化：将深度优先搜索改为基于部分效用值的权重优先搜索，然后基于算法已执行时间进行剪枝。</p>
+<p>上面的说法可能过于复杂，下面用一句话总结：遍历所有可能序列，哪个效果好就用哪个，如果遍历需要的时间太长，就根据前几张牌的效果来判断优先验证哪个序列，保证AI执行时间有上限。</p>
+<h2
+id="炉石传说与决斗链接决斗链接ai策略分析">炉石传说与决斗链接：决斗链接AI策略分析</h2>
+<p>相比于炉石传说，决斗链接的AI就难做的多，原因如下： 1.
+决斗链接的卡牌往往需要组合使用，单卡价值难以量化，此外卡牌效果价值往往远高于卡牌数值价值，卡牌效果价值难以评估。
+2.
+在上一条的基础上，决斗链接还具有回合外响应机制，当一套卡牌组合的其中关键的一张被无效后，整套Combo的意义就会被消解。
+3.
+在上两条的基础上，决斗链接的卡牌效果还具有一个特性，那就是先支付代价，再结算效果，这也意味着当卡牌被无效时其代价会白白损失。
+4.
+炉石传说的致胜策略强调“场面”，场面可以被量化，而游戏王的致胜策略强调“展开”，离目标还差多远很难被量化。
+5.
+决斗链接有“无名决斗者”这种PVE玩法，在其中游戏的基础规则会改变（例如：不能使用怪兽效果等），无法设置一张卡片的静态价值。
+6. 决斗链接的单回合分为多个阶段，卡牌有不同的触发阶段与发动条件。</p>
+<p>我们先看下决斗链接现在的AI是怎么做的，进行一些分析： 1.
+AI对于血量变化的评估优先级极高，不会进行任何会导致自己损失更多血量的策略。
+2.
+可能是由于1的原因，AI会献祭弧光龙上级召唤青眼白龙（不考虑怪兽特效而是更偏向召唤更高的攻击力，已达到最大化血量变化的目的）
+3.
+能利用卡牌效果，知道在合适的阶段使用，但无法判断卡牌连锁后的结果，对于卡组内的卡牌情况未知。
+4.
+根据上述的原因5、6与分析3，AI必然是基于反演（先假设进行一项操作，以评估结果判断进行这项操作的收益）来判断卡牌的使用价值，每次可以行动时，对所有可发动卡牌进行遍历评估。</p>
+<p>根据上述的分析，我们猜测性地反推决斗链接目前的AI逻辑： 1.
+卡牌使用优先级： - 使对手生命值归0 -
+减少我方即将受到的生命损失(生命回复&gt;攻击表示召唤攻击力高于对方场上怪兽攻击力的怪兽&gt;守备表示召唤守备力最高的怪兽)
+&gt; - 对对手造成生命伤害 (生命伤害&gt;攻击表示召唤攻击力最高的怪兽) -
+使自己场上怪兽攻击力最大化（特殊召唤/上级召唤/召唤&gt;装备魔法卡） -
+使己方场上魔法陷阱卡数量增加（不放置通常魔法卡） -
+使敌方场上魔法陷阱卡数量减少 - 使己方手卡增加 - 使敌方手卡减少 2.
+基于1所述的卡牌使用优先级，对于所有可使用的卡牌，判断卡牌使用优先级并直接发动（由于卡牌的使用效果可能被对手连锁无效，所以不能提前决定所有卡牌使用顺序）。对于魔法陷阱卡，如果卡牌使用后无法使优先级内任何一项发生变化，则不发动。
+3.
+在1、2基础上，若卡牌包含投骰子概率效果，假定一定得到对己方有利的效果；若卡牌包含指名、卡组检索（涉及到手卡、卡组中其他卡牌时），一律忽略该效果。</p>
+<p>以上是我反推的决斗链接的AI逻辑，游戏中实际应用的策略可能在这套框架下加一些额外的规则。尽管这套AI逻辑通用性较强，不用考虑卡牌的具体用法，出了新卡也能沿用而不是一张卡写一组规则。但其中最大的问题是：卡牌的实际用法可能被忽视;AI无法考虑对手的陷阱卡反制;无法利用卡牌配合打出Combo。卡组检索与定向检索是游戏王的核心机制，例如“吸血鬼转换”这张卡可以将卡组中的场地魔法卡“吸血鬼帝国”直接从卡组使用，但通用AI完全不考虑卡组检索逻辑；又例如“二者一两损”在有“吸血鬼帝国”存在的情况下发动可以实际上起到破坏对手一张卡牌的效果，但这套AI逻辑不会考虑其他卡牌的效果，因此，二者一两损的实际效果得不到发挥。</p>
+<h2 id="决斗链接ai策略优化">决斗链接AI策略优化</h2>
+<p>因此，这里提出一个更能发挥AI潜力的方案： 1.
+将卡组内容暴露给AI，使卡牌定向检索可以被预演。 2.
+参考之前在炉石章节提出的搜索树，对所有(己方可行策略Action与对手可行策略Action)建立搜索树，每条根节点到叶子节点的路径即为行动预测序列。以搜索树的形式对每条序列进行评估。
+3.
+对于2中的“对手可行策略Action”，由于对手里侧表示卡牌内容是不可见的，以如下规则评估对手卡牌：
+- 定义对方场上覆盖陷阱卡数量为a,每回合内产生一次[0-1]范围的随机值p1， 若
+p1&lt; a * pt
+(pt为预设的陷阱卡发动概率,由策划配表或是机器学习得到具体值，可以先假设其为0.1),
+将“受欢迎的卡”（游戏内置的玩家卡牌使用频率模组）中前五(具体数量配表或由程序根据AI性能动态控制)的陷阱卡与速攻魔法卡加入搜索树进行估计。
+-
+当且仅当搜索树中涉及使对方里侧表示怪兽翻面的行为时，以pm（类似上文，但其值会小于pt）概率将怪兽卡加入搜索树中进行估计。基于怪兽可能星级(召唤时已知大概范围)、可能种族(由对手场上加墓地怪兽卡最高出现频率估计种族）将“受欢迎的卡”内符合条件的前五张怪兽卡加入搜索树进行估计。</p>
+<p>以上AI策略有几项优点： 1. 可以利用定向检索（吸血鬼帝国、沉默魔导士）
+2. 可以利用到卡牌的组合效果（龙之灵庙、黑魔导+千把刀） 3.
+可以考虑到对方的效果反制卡牌（风暴、优化自己卡牌使用顺序骗康）</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">踢叉叉</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://txinx.github.io/2021/04/05/%E5%A6%82%E4%BD%95%E4%B8%BA%E5%86%B3%E6%96%97%E9%93%BE%E6%8E%A5%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA%E6%9B%B4%E6%99%BA%E6%85%A7%E7%9A%84AI/">https://txinx.github.io/2021/04/05/%E5%A6%82%E4%BD%95%E4%B8%BA%E5%86%B3%E6%96%97%E9%93%BE%E6%8E%A5%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA%E6%9B%B4%E6%99%BA%E6%85%A7%E7%9A%84AI/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://TXINX.github.io" target="_blank">踢叉叉的寻微之旅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Game-Design/">Game Design</a><a class="post-meta__tags" href="/tags/Game-AI/">Game AI</a></div><div class="post_share"><div class="social-share" data-image="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fb17cc9fac11751e7f98e16ef37039719244afbbe.jpg&amp;refer=http%3A%2F%2Fi0.hdslb.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1654625796&amp;t=889ad9cdfcbb69a33c2b155c390108e6" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/05/20/%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E7%A7%AF%E5%88%86%E7%B3%BB%E7%BB%9F%E8%A7%A3%E8%AF%BB/"><img class="prev-cover" src="https://img2.baidu.com/it/u=3367475766,2718671385&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=800&amp;h=500" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">酒馆战棋积分系统解读</div></div></a></div><div class="next-post pull-right"><a href="/2021/03/19/%E7%BA%BF%E6%80%A7%E8%A7%84%E5%88%92%E5%9C%A8%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F%E5%9F%BA%E5%BB%BA%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/"><img class="next-cover" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.nga.178.com%2Fattachments%2Fmon_201905%2F24%2F-7Q5-854qXdZ3lT3cS1z4-140.jpg&amp;refer=http%3A%2F%2Fimg.nga.178.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1654625496&amp;t=e582ab053c5ad5a9a0cd09dbe1ca27e2" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">线性规划在明日方舟基建系统中的应用</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/03/06/%E5%8E%9F%E7%A5%9ENPC%E5%8A%A8%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%8F%8D%E6%8E%A8/" title="原神NPC动作机制反推"><img class="cover" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic1.zhimg.com%2Fv2-49216a6a123256cd87d3ae3638158bde_r.jpg%3Fsource%3D1940ef5c&refer=http%3A%2F%2Fpic1.zhimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654624995&t=2d110b326178b1a5fd91509becea1186" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-03-06</div><div class="title">原神NPC动作机制反推</div></div></a></div><div><a href="/2021/07/05/%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E6%AE%B5%E4%BD%8D%E7%AE%97%E6%B3%95%E9%87%8D%E5%BB%BA%E4%B8%8E%E7%B3%BB%E6%95%B0%E6%8E%A8%E5%AF%BC/" title="酒馆战棋段位算法重建与系数推导"><img class="cover" src="https://img0.baidu.com/it/u=492854779,2716447158&fm=253&fmt=auto&app=138&f=JPEG?w=1072&h=500" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-07-05</div><div class="title">酒馆战棋段位算法重建与系数推导</div></div></a></div><div><a href="/2021/05/20/%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E7%A7%AF%E5%88%86%E7%B3%BB%E7%BB%9F%E8%A7%A3%E8%AF%BB/" title="酒馆战棋积分系统解读"><img class="cover" src="https://img2.baidu.com/it/u=3367475766,2718671385&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-20</div><div class="title">酒馆战棋积分系统解读</div></div></a></div><div><a href="/2022/01/04/ComponentialTree,%20%E4%B8%80%E7%A7%8D%E8%A1%8C%E4%B8%BA%E6%A0%91%E6%A8%A1%E5%9D%97%E5%8C%96%E7%9A%84%E7%BB%84%E7%BB%87%E6%A1%86%E6%9E%B6/" title="Componential Tree, 一种行为树模块化的组织框架"><img class="cover" src="/images/BehaviourTree/Sample.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-04</div><div class="title">Componential Tree, 一种行为树模块化的组织框架</div></div></a></div><div><a href="/2021/03/19/%E7%BA%BF%E6%80%A7%E8%A7%84%E5%88%92%E5%9C%A8%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F%E5%9F%BA%E5%BB%BA%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/" title="线性规划在明日方舟基建系统中的应用"><img class="cover" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.nga.178.com%2Fattachments%2Fmon_201905%2F24%2F-7Q5-854qXdZ3lT3cS1z4-140.jpg&refer=http%3A%2F%2Fimg.nga.178.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654625496&t=e582ab053c5ad5a9a0cd09dbe1ca27e2" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-03-19</div><div class="title">线性规划在明日方舟基建系统中的应用</div></div></a></div><div><a href="/2021/02/16/%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F%E6%AF%8F%E6%97%A5%E4%BB%BB%E5%8A%A1%E7%B3%BB%E7%BB%9F%E5%8F%8D%E6%8E%A8/" title="明日方舟每日任务系统反推"><img class="cover" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farticle%2Fc2b29fd8ca5f5f5e1868847ace34b1dd7245dd77.png&refer=http%3A%2F%2Fi0.hdslb.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654624533&t=1cc5d3a0e22a3a411ca294349ad51521" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-02-16</div><div class="title">明日方舟每日任务系统反推</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/base/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">踢叉叉</div><div class="author-info__description">Game Designer</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/TXINX"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Have fun in gaming and making games!</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80%E6%9C%AC%E6%96%87%E7%9A%84%E7%9B%AE%E6%A0%87"><span class="toc-number">1.</span> <span class="toc-text">前言：本文的目标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%82%89%E7%9F%B3%E4%BC%A0%E8%AF%B4%E4%B8%8E%E5%86%B3%E6%96%97%E9%93%BE%E6%8E%A5%E7%82%89%E7%9F%B3%E4%BC%A0%E8%AF%B4ai%E7%AD%96%E7%95%A5%E8%AE%BE%E8%AE%A1"><span class="toc-number">2.</span> <span class="toc-text">炉石传说与决斗链接：炉石传说AI策略设计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%82%89%E7%9F%B3%E4%BC%A0%E8%AF%B4%E4%B8%8E%E5%86%B3%E6%96%97%E9%93%BE%E6%8E%A5%E5%86%B3%E6%96%97%E9%93%BE%E6%8E%A5ai%E7%AD%96%E7%95%A5%E5%88%86%E6%9E%90"><span class="toc-number">3.</span> <span class="toc-text">炉石传说与决斗链接：决斗链接AI策略分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%B3%E6%96%97%E9%93%BE%E6%8E%A5ai%E7%AD%96%E7%95%A5%E4%BC%98%E5%8C%96"><span class="toc-number">4.</span> <span class="toc-text">决斗链接AI策略优化</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/06/09/DistanceMatchingInLyra/" title="Lyra中的Distance Matching"><img src="https://docs.unrealengine.com/5.0/Images/animating-characters-and-objects/SkeletalMeshAnimation/AssetsFeatures/Locomotion/distance-matching/BannerImage.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Lyra中的Distance Matching"/></a><div class="content"><a class="title" href="/2022/06/09/DistanceMatchingInLyra/" title="Lyra中的Distance Matching">Lyra中的Distance Matching</a><time datetime="2022-06-08T18:01:11.000Z" title="发表于 2022-06-09 02:01:11">2022-06-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/01/04/ComponentialTree,%20%E4%B8%80%E7%A7%8D%E8%A1%8C%E4%B8%BA%E6%A0%91%E6%A8%A1%E5%9D%97%E5%8C%96%E7%9A%84%E7%BB%84%E7%BB%87%E6%A1%86%E6%9E%B6/" title="Componential Tree, 一种行为树模块化的组织框架"><img src="/images/BehaviourTree/Sample.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Componential Tree, 一种行为树模块化的组织框架"/></a><div class="content"><a class="title" href="/2022/01/04/ComponentialTree,%20%E4%B8%80%E7%A7%8D%E8%A1%8C%E4%B8%BA%E6%A0%91%E6%A8%A1%E5%9D%97%E5%8C%96%E7%9A%84%E7%BB%84%E7%BB%87%E6%A1%86%E6%9E%B6/" title="Componential Tree, 一种行为树模块化的组织框架">Componential Tree, 一种行为树模块化的组织框架</a><time datetime="2022-01-04T07:47:46.000Z" title="发表于 2022-01-04 15:47:46">2022-01-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/11/27/%E7%A0%B4%E6%99%93%E4%BC%A0%E8%AF%B4%E6%B8%B8%E7%8E%A9%E7%AC%94%E8%AE%B0/" title="破晓传说游玩笔记"><img src="https://img2.baidu.com/it/u=458559976,3305785865&amp;fm=253&amp;fmt=auto?w=1524&amp;h=800" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="破晓传说游玩笔记"/></a><div class="content"><a class="title" href="/2021/11/27/%E7%A0%B4%E6%99%93%E4%BC%A0%E8%AF%B4%E6%B8%B8%E7%8E%A9%E7%AC%94%E8%AE%B0/" title="破晓传说游玩笔记">破晓传说游玩笔记</a><time datetime="2021-11-27T07:47:46.000Z" title="发表于 2021-11-27 15:47:46">2021-11-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/07/05/%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E6%AE%B5%E4%BD%8D%E7%AE%97%E6%B3%95%E9%87%8D%E5%BB%BA%E4%B8%8E%E7%B3%BB%E6%95%B0%E6%8E%A8%E5%AF%BC/" title="酒馆战棋段位算法重建与系数推导"><img src="https://img0.baidu.com/it/u=492854779,2716447158&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=1072&amp;h=500" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="酒馆战棋段位算法重建与系数推导"/></a><div class="content"><a class="title" href="/2021/07/05/%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E6%AE%B5%E4%BD%8D%E7%AE%97%E6%B3%95%E9%87%8D%E5%BB%BA%E4%B8%8E%E7%B3%BB%E6%95%B0%E6%8E%A8%E5%AF%BC/" title="酒馆战棋段位算法重建与系数推导">酒馆战棋段位算法重建与系数推导</a><time datetime="2021-07-05T07:47:46.000Z" title="发表于 2021-07-05 15:47:46">2021-07-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/20/%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E7%A7%AF%E5%88%86%E7%B3%BB%E7%BB%9F%E8%A7%A3%E8%AF%BB/" title="酒馆战棋积分系统解读"><img src="https://img2.baidu.com/it/u=3367475766,2718671385&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=800&amp;h=500" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="酒馆战棋积分系统解读"/></a><div class="content"><a class="title" href="/2021/05/20/%E9%85%92%E9%A6%86%E6%88%98%E6%A3%8B%E7%A7%AF%E5%88%86%E7%B3%BB%E7%BB%9F%E8%A7%A3%E8%AF%BB/" title="酒馆战棋积分系统解读">酒馆战棋积分系统解读</a><time datetime="2021-05-20T07:47:46.000Z" title="发表于 2021-05-20 15:47:46">2021-05-20</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farchive%2Fb17cc9fac11751e7f98e16ef37039719244afbbe.jpg&amp;refer=http%3A%2F%2Fi0.hdslb.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1654625796&amp;t=889ad9cdfcbb69a33c2b155c390108e6')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By 踢叉叉</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
